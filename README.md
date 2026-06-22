@@ -91,3 +91,25 @@ http://127.0.0.1:5566/status
 | ポップアップが「確認中」のまま | CSPエラー | `popup.js` を別ファイルに分離する |
 | 動画が検出されない | 拡張機能が古い | 🔄更新 → x.com を F5 更新 |
 | ダウンロード失敗が続く | yt-dlp未インストール | `python -m pip install yt-dlp` を実行 |
+
+FFmpegをインストールする
+
+https://www.gyan.dev/ffmpeg/builds/ を開く
+「ffmpeg-release-essentials.zip」 をダウンロード
+ZIPを展開して中の bin フォルダのパスをコピー
+
+（例: C:\ffmpeg\bin）
+Windowsの「環境変数」に追加：
+
+スタートメニューで「環境変数」と検索
+「システム環境変数の編集」→「環境変数」
+Path を選択して「編集」→「新規」
+C:\ffmpeg\bin を追加してOK
+
+
+コマンドプロンプトを再起動して確認：
+
+bashffmpeg -version
+
+FFmpegが入ればyt-dlpが自動で映像と音声を結合して1つのmp4ファイルとして保存されます。サーバーの再起動も忘れずに！
+
