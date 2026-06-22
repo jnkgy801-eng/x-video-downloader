@@ -111,34 +111,6 @@
     保存先: <a href="#" id="downloadDir">—</a>
   </div>
 
-  <script>
-    const BACKEND = "http://localhost:5566";
-
-    async function refresh() {
-      try {
-        const res = await fetch(`${BACKEND}/status`, { signal: AbortSignal.timeout(2000) });
-        const data = await res.json();
-        document.getElementById("statusDot").className = "dot online";
-        document.getElementById("statusText").textContent = "バックエンド稼働中";
-        document.getElementById("statusBadge").className = "badge active";
-        document.getElementById("statusBadge").textContent = "接続済";
-        document.getElementById("statDownloaded").textContent = data.stats.total_downloaded;
-        document.getElementById("statSkipped").textContent = data.stats.total_skipped;
-        document.getElementById("statFailed").textContent = data.stats.total_failed;
-        document.getElementById("downloadDir").textContent = data.download_dir || "—";
-      } catch {
-        document.getElementById("statusDot").className = "dot offline";
-        document.getElementById("statusText").textContent = "バックエンド未起動";
-        document.getElementById("statusBadge").className = "badge";
-        document.getElementById("statusBadge").textContent = "未接続";
-        ["statDownloaded","statSkipped","statFailed"].forEach(id => {
-          document.getElementById(id).textContent = "—";
-        });
-      }
-    }
-
-    refresh();
-    setInterval(refresh, 3000);
-  </script>
+   <script src="popup.js"></script>
 </body>
 </html>

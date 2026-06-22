@@ -1,15 +1,15 @@
-/**
- * バックグラウンドサービスワーカー
- * 拡張機能の状態管理とコンテンツスクリプトとの通信を担当
- */
+const BACKEND_URL = "http://localhost:5566/download";
 
-chrome.runtime.onInstalled.addListener(() => {
-  console.log("[X動画DL] 拡張機能がインストールされました");
-});
-
-// コンテンツスクリプトからのメッセージを受け取る（将来の拡張用）
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  if (message.type === "VIDEO_DETECTED") {
-    sendResponse({ status: "ok" });
-  }
+  if (message.type !== "DOWNLOAD") return;
+
+  fetch(BACKEND_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ url: message.url }),
+  })
+    .then((res) => sendResponse({ ok: res.ok, status: res.status }))
+    .catch((err) => sendResponse({ ok: false, error: err.message }));
+
+  return true; // 非同期レスポンスに必須
 });
