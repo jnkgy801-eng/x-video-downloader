@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>X動画ダウンローダー</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      width: 300px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #0f1117;
+      color: #e7e9ea;
+    }
+    .header {
+      padding: 16px;
+      background: #1d9bf0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .header svg { flex-shrink: 0; }
+    .header h1 { font-size: 15px; font-weight: 700; }
+    .header p { font-size: 11px; opacity: 0.85; margin-top: 2px; }
+    .section {
+      padding: 14px 16px;
+      border-bottom: 1px solid #2f3336;
+    }
+    .status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+    .dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: #71767b;
+      flex-shrink: 0;
+    }
+    .dot.online { background: #00ba7c; }
+    .dot.offline { background: #f4212e; }
+    .status-label { font-size: 13px; }
+    .stat-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-box {
+      background: #16181c;
+      border: 1px solid #2f3336;
+      border-radius: 8px;
+      padding: 10px 8px;
+      text-align: center;
+    }
+    .stat-num { font-size: 22px; font-weight: 700; color: #1d9bf0; }
+    .stat-label { font-size: 10px; color: #71767b; margin-top: 3px; }
+    .footer {
+      padding: 12px 16px;
+      font-size: 11px;
+      color: #71767b;
+      line-height: 1.5;
+    }
+    .footer a { color: #1d9bf0; text-decoration: none; }
+    .badge {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 600;
+      background: #2f3336;
+      color: #71767b;
+    }
+    .badge.active { background: #0a3d28; color: #00ba7c; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.747l7.73-8.835L1.254 2.25H8.08l4.258 5.63 5.906-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z"/>
+    </svg>
+    <div>
+      <h1>X動画自動ダウンローダー</h1>
+      <p>閲覧した動画を自動保存</p>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="status-row">
+      <div class="dot" id="statusDot"></div>
+      <span class="status-label" id="statusText">バックエンド確認中...</span>
+      <span class="badge" id="statusBadge">-</span>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-box">
+        <div class="stat-num" id="statDownloaded">-</div>
+        <div class="stat-label">ダウンロード</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statSkipped">-</div>
+        <div class="stat-label">スキップ</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num" id="statFailed">-</div>
+        <div class="stat-label">失敗</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    バックエンドを起動: <code>python backend/server.py</code><br>
+    保存先: <a href="#" id="downloadDir">—</a>
+  </div>
+
+  <script>
+    const BACKEND = "http://localhost:5566";
+
+    async function refresh() {
+      try {
+        const res = await fetch(`${BACKEND}/status`, { signal: AbortSignal.timeout(2000) });
+        const data = await res.json();
+        document.getElementById("statusDot").className = "dot online";
+        document.getElementById("statusText").textContent = "バックエンド稼働中";
+        document.getElementById("statusBadge").className = "badge active";
+        document.getElementById("statusBadge").textContent = "接続済";
+        document.getElementById("statDownloaded").textContent = data.stats.total_downloaded;
+        document.getElementById("statSkipped").textContent = data.stats.total_skipped;
+        document.getElementById("statFailed").textContent = data.stats.total_failed;
+        document.getElementById("downloadDir").textContent = data.download_dir || "—";
+      } catch {
+        document.getElementById("statusDot").className = "dot offline";
+        document.getElementById("statusText").textContent = "バックエンド未起動";
+        document.getElementById("statusBadge").className = "badge";
+        document.getElementById("statusBadge").textContent = "未接続";
+        ["statDownloaded","statSkipped","statFailed"].forEach(id => {
+          document.getElementById(id).textContent = "—";
+        });
+      }
+    }
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
