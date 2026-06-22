@@ -67,7 +67,7 @@ def download_video(url: str):
     )
 
     cmd = [
-        "yt-dlp",
+        "python", "-m", "yt_dlp",
         "--format", format_str,
         "--output", output_template,
         "--merge-output-format", "mp4",
